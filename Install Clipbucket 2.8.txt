@@ -1,0 +1,91 @@
+1. su & apt-get update					Update linux
+
+2. apt-get install apache2 mariadb-server php5 php5-gd php5-mysql php5-curl php5-xsl php5-cli php-pear unzip	Install php, apache
+
+3. apt-get install imagemagick php5-imagick		Install imagemagick
+   php5enmod imagick
+
+4. apt-add-repository ppa:mc3man/trusty-media		Compile ffmpeg
+   apt-get update
+   apt-get install ffmpeg gstreamer0.10-ffmpeg		Install ffmpeg
+
+5. apt-get install ruby					Install ruby languge
+
+6. gem install flvtool2					Install flvtool2
+
+7. apt-get install gpac mediainfo			Install MP4Box
+
+8. nano /etc/php5/apache2/php.ini			Config php.ini
+
+	upload_max_filesize = 1000M
+	max_execution_time = 7300
+	max_input_time = 300
+	memory_limit = 256M
+	magic_quotes_gpc = on
+	magic_quotes_runtime = off
+	post_max_size = 500M
+	register_globals = off
+	safe_mode = off
+	output_buffering = off
+	display_errors = on
+
+9. service apache2 restart				Start apache2
+
+10. mysql_secure_installation				Config mariadb server
+
+11. mysql -u root -p					Create database
+
+	CREATE DATABASE clipbucketdb;
+ 	CREATE USER 'clipbucketuser'@'localhost' IDENTIFIED BY 'Pa$$worD';
+ 	GRANT ALL PRIVILEGES ON clipbucketdb.* TO 'clipbucketuser'@'localhost';
+ 	FLUSH PRIVILEGES;
+ 	EXIT;
+
+12. touch /etc/apache2/sites-available/clipbucket.conf		Config apache2
+    ln -s /etc/apache2/sites-available/clipbucket.conf /etc/apache2/sites-enabled/clipbucket.conf
+    nano /etc/apache2/sites-available/clipbucket.conf
+
+	<VirtualHost *:80>
+	ServerAdmin info@clipbucket.linoxide.com
+	DocumentRoot /var/www/clipbucket/
+	ServerName clipbucket.linoxide.com
+	ServerAlias www.clipbucket.linoxide.com
+	<Directory /var/www/clipbucket/>
+	Options FollowSymLinks
+	AllowOverride All
+	</Directory>
+	ErrorLog /var/log/apache2/clipbucket.linoxide.com-error_log
+	CustomLog /var/log/apache2/clipbucket.linoxide.com-access_log common
+	</VirtualHost>
+
+    a2enmod rewrite			Enabling module rewrite
+    service apache2 restart
+
+13. cd /tmp/
+    wget http://downloads.sourceforge.net/project/clipbucket/ClipBucket%20v2/clipbucket-2.8.v3354-stable.zip
+    unzip clipbucket-2.8.v3354-stable.zip
+
+14. mkdir /var/www/clipbucket
+    cp -r /tmp/clipbucket-2.8.v3354-stable/upload/* /var/www/clipbucket/
+    cp /tmp/clipbucket-2.8.v3354-stable/upload/.htaccess /var/www/clipbucket/
+
+15. chmod -R 777 /var/www/clipbucket/includes/
+    chmod -R 777 /var/www/clipbucket/files/
+    chmod -R 777 /var/www/clipbucket/images/
+    chmod -R 777 /var/www/clipbucket/cache/
+    chmod -R 777 /var/www/clipbucket/cb_install/
+
+16. chown www-data:www-data -R /var/www/clipbucket/
+
+17. crontab -e
+
+	* * * * * php -q /var/www/clipbucket/actions/video_convert.php
+	* * * * * php -q /var/www/clipbucket/actions/verify_converted_videos.php
+	0 0,12,13 * * * php -q /var/www/clipbucket/actions/update_cb_stats.php
+
+18. iptables -A INPUT -p tcp -m tcp --dport 80 -j ACCEPT		Allow firewall
+    iptables-save > /etc/iptables-up.rules
+
+19. nano /etc/hosts			Add ip into hosts file
+
+20. Open webbrowser enter address: aicmedia.com
