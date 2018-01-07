@@ -1,3 +1,6 @@
+#!/bin/sh
+#sed -i -e 's/\r$//' your_script.sh
+
 apt-get update
 
 apt-get install -y apache2 mariadb-server php5 php5-gd php5-mysql php5-curl php5-xsl php5-cli php-pear unzip
